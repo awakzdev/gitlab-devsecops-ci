@@ -1,0 +1,91 @@
+stages:
+  - test # Will run the predefined SAST template
+  - secret-detection
+  - owasp-dast
+  - report
+  - build
+
+include:
+  - template: Security/SAST.gitlab-ci.yml
+  - template: Security/Secret-Detection.gitlab-ci.yml
+  - template: Security/API-Security.gitlab-ci.yml
+  
+variables:
+  GIT_DEPTH: "0"
+  SECRET_DETECTION_HISTORIC_SCAN: "true"
+
+# -----------------------------------------------------------
+# Security Scan Pipeline
+# This section runs SAST, Secret Detection, DAST, and the
+# combined HTML Security Report. All jobs in this section
+# run only when the commit message contains: "initiate-scan".
+# -----------------------------------------------------------
+semgrep-sast:
+  rules:
+    - if: '$CI_COMMIT_MESSAGE =~ /initiate-scan/i'
+
+secret_detection:
+  stage: secret-detection
+  rules:
+    - if: '$CI_COMMIT_MESSAGE =~ /initiate-scan/i'
+
+owasp-dast:
+  stage: owasp-dast
+  image: registry.gitlab.com/security-products/dast:latest
+  rules:
+    - if: '$CI_COMMIT_MESSAGE =~ /initiate-scan/i || $CI_COMMIT_MESSAGE =~ /initiate-owasp/i'
+  variables:
+    DAST_WEBSITE: "https://dev-ib-gw-service-465142607641.me-west1.run.app"
+    DAST_AUTH_URL: "https://dev-ib-gw-service-465142607641.me-west1.run.app/login"
+    # Form fields
+    DAST_USERNAME_FIELD: 'css:input[name="email"]'
+    DAST_PASSWORD_FIELD: 'css:input[name="password"]'
+    DAST_SUBMIT_FIELD:   'css:button[type="submit"]'
+    # Debug
+    DAST_FULL_SCAN_ENABLED: "true"
+    SECURE_LOG_LEVEL: "debug"
+    DAST_AUTH_REPORT: "true"
+    # Timeout settings
+    DAST_PAGE_MAX_RESPONSE_SIZE_MB: "50"
+    DAST_PAGE_DOM_READY_TIMEOUT: "15s"
+    DAST_PAGE_ELEMENT_READY_TIMEOUT: "20s"
+  script:
+    - /analyze
+  artifacts:
+    reports:
+      dast: gl-dast-report.json
+    paths:
+      - gl-dast-report.json
+      - gl-dast-debug-auth-report.html
+    expire_in: 7 days 
+    when: always
+ 
+security_report_html:
+  image: python:3.12-alpine
+  stage: report
+  needs:
+    - job: semgrep-sast
+      artifacts: true
+    - job: secret_detection
+      artifacts: true
+    - job: owasp-dast
+      artifacts: true
+  script:
+    - |
+      python3 security/report.py \
+        --sast gl-sast-report.json \
+        --secrets gl-secret-detection-report.json \
+        --dast gl-dast-report.json \
+        --out security-report.html \
+        --project "$CI_PROJECT_PATH" \
+        --commit "$CI_COMMIT_SHORT_SHA"
+  artifacts:
+    paths:
+      - security-report.html
+    expose_as: "Security Report HTML"
+    when: always
+    expire_in: 14 days
+  rules:
+    - if: '$CI_COMMIT_MESSAGE =~ /initiate-scan/i' 
+# -----------------------------------------------------------
+
