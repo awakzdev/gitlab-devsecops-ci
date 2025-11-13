@@ -12,6 +12,9 @@ The pipeline includes:
 
 All scans run **only when the commit message contains `initiate-scan`**, to avoid running heavy security jobs on every push.
 
+📄 **Live example:**  
+👉 [View the final HTML report](https://awakzdev.github.io/gitlab-devsecops-ci/security-report.html)
+
 ---
 
 # 🚀 Pipeline Overview
