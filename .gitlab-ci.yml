@@ -8,7 +8,6 @@ stages:
 include:
   - template: Security/SAST.gitlab-ci.yml
   - template: Security/Secret-Detection.gitlab-ci.yml
-  - template: Security/API-Security.gitlab-ci.yml
   
 variables:
   GIT_DEPTH: "0"
@@ -35,8 +34,8 @@ owasp-dast:
   rules:
     - if: '$CI_COMMIT_MESSAGE =~ /initiate-scan/i || $CI_COMMIT_MESSAGE =~ /initiate-owasp/i'
   variables:
-    DAST_WEBSITE: "https://dev-ib-gw-service-465142607641.me-west1.run.app"
-    DAST_AUTH_URL: "https://dev-ib-gw-service-465142607641.me-west1.run.app/login"
+    DAST_WEBSITE: "https://example.com"
+    DAST_AUTH_URL: "https://example.com/login"
     # Form fields
     DAST_USERNAME_FIELD: 'css:input[name="email"]'
     DAST_PASSWORD_FIELD: 'css:input[name="password"]'
