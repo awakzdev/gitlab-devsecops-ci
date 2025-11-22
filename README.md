@@ -1,4 +1,4 @@
-# 📘 GitLab DevSecOps CI/CD  
+# GitLab DevSecOps CI/CD  
 ### Automated SAST, Secrets, OWASP DAST & Unified HTML Security Report
 
 This repository demonstrates a fully automated **DevSecOps pipeline** on GitLab using GitLab-provided security templates combined with a custom OWASP DAST job and a unified HTML Security Report generator.
@@ -17,7 +17,7 @@ All scans run **only when the commit message contains `initiate-scan`**, to avoi
 
 ---
 
-# 🚀 Pipeline Overview
+# Pipeline Overview
 
 ```yaml
 stages:
@@ -34,7 +34,7 @@ include:
 
 ---
 
-# 🔐 Environment Variables
+# Environment Variables
 
 | Variable | Description |
 |---------|-------------|
@@ -53,9 +53,9 @@ include:
 
 ---
 
-# 🛡 Security Jobs
+# Security Jobs
 
-## ▶️ 1. **SAST (Semgrep)**  
+## 1. **SAST (Semgrep)**  
 Runs only when commit message contains **initiate-scan**
 
 ```yaml
@@ -66,7 +66,7 @@ semgrep-sast:
 
 ---
 
-## 🕵️ 2. **Secret Detection**
+## 2. **Secret Detection**
 
 ```yaml
 secret_detection:
@@ -77,7 +77,7 @@ secret_detection:
 
 ---
 
-## 🧪 3. **OWASP ZAP Authenticated DAST**
+## 3. **OWASP ZAP Authenticated DAST**
 
 ```yaml
 owasp-dast:
@@ -108,7 +108,7 @@ Artifacts include:
 
 ---
 
-# 📊 4. **Unified HTML Security Report**
+# 4. **Unified HTML Security Report**
 
 ```yaml
 security_report_html:
@@ -128,7 +128,7 @@ security_report_html:
 
 ---
 
-# 🧩 Triggering Scans
+# Triggering Scans
 
 Add **any** of these phrases to your commit message:
 
@@ -137,7 +137,7 @@ Add **any** of these phrases to your commit message:
 
 ---
 
-# 📁 Artifacts Generated
+# Artifacts Generated
 
 | File | Description |
 |------|-------------|
